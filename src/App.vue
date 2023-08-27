@@ -1,9 +1,11 @@
 <template>
     <label>
-        <div v-hook:click.popup="{name: 'something'}">Click</div>
+        <div v-hook:click.expand.toggle="true">Click</div>
     </label>
 
-    <div style="background: red; width: 100px; height: 100px" v-hook:mousemove.s="'s'"></div>
+    {{ $hook('expand', {default: false}) }}
+
+    <div v-if="$hook('expand')" style="background: red; width: 100px; height: 100px"></div>
 </template>
 
 <script setup lang="ts">

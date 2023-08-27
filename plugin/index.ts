@@ -1,3 +1,4 @@
+import {reactive, Ref, ref} from "vue";
 import type {App, Plugin} from "@vue/runtime-core";
 import {createHooks} from 'hookable';
 
@@ -25,43 +26,83 @@ interface vueDirectiveOptions {
     prefix?: string
 }
 
+type Obj<T> = {
+    [name: string]: T
+}
+
+interface vueDirectiveHookOptions {
+    clear?: number,
+    default?: any,
+}
+
 const hook = createHooks();
 
 export const vueDirective = {
     install(app: App, options?: vueDirectiveOptions | null) {
+        let _prefix = '';
 
+        if (options) {
+            const {listeners, prefix} = options;
 
-        app.directive('hook', (el, binding) => {
-            if(!eventListeners.includes(binding.arg || '')) return;
-            let _prefix = '';
+            if (listeners)
+                eventListeners.push(...listeners);
 
-            if(options) {
-                const {listeners, prefix} = options;
+            if (prefix)
+                _prefix = prefix;
+        }
 
-                if(listeners)
-                    eventListeners.push(...listeners);
+        const hooks: Ref<Obj<any>> = ref({});
+        const hooksTimeouts: Ref<Obj<any>> = ref({});
 
-                if(prefix)
-                    _prefix = prefix;
+        app.config.globalProperties.$hook = (key: string, options?: vueDirectiveHookOptions) => {
+            const opts = {clear: null, default: null};
+            if (options) {
+                const {clear, default: _def} = options;
+                if (clear) opts.clear = clear;
+                if (_def) opts.default = _def;
             }
-            if(!binding.arg) {
-                throw new Error('[Vue Directive] Directive doesn\'t have event listener');
-            }
 
-            if(!el) {
-                throw new Error('[Vue Directive] Directive should be on element');
-            }
+            if(hooks.value[key] === undefined) hooks.value[key] = opts.default;
 
-            el.addEventListener(binding.arg, async () => {
-                if(Object.keys(binding.modifiers).length >= 1) {
-                    for (const key of Object.keys(binding.modifiers)) {
-                        await hook.callHook(`${_prefix}${key}`, binding.value)
-                    }
-                } else {
-                    await hook.callHook(`${_prefix}${binding.arg}`, binding.value)
+            if (hooksTimeouts.value[key]) clearTimeout(hooksTimeouts.value[key]);
+
+            if (opts.clear) {
+                hooksTimeouts.value[key] = setTimeout(() => {
+                    hooks.value[key] = opts.default;
+                }, opts.clear)
+            }
+            return hooks.value[key];
+        }
+
+
+        /**
+         * Directive
+         */
+
+
+        app.directive('hook', {
+            mounted: (el, binding) => {
+                const arg = binding.arg || '';
+                if (!eventListeners.includes(arg)) return;
+
+                if (!el) {
+                    throw new Error('[Vue Hook Directive] Directive should be on an element');
                 }
-            })
+
+                el.addEventListener(arg, async () => {
+                    const modifiers = Object.keys(binding.modifiers);
+                    if (modifiers.length >= 1) {
+                        const last = modifiers.at(-1) === 'toggle' ? modifiers.pop() : null
+                        for (const modifier of modifiers) {
+                            let value = last === 'toggle' ? !hooks.value[modifier] : binding.value;
+                            hooks.value[modifier] = value;
+                            await hook.callHook(`${_prefix}${modifier}`, value);
+                        }
+                    }
+                });
+            }
         });
+
     }
 } as Plugin<vueDirectiveOptions>;
 

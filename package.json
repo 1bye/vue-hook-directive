@@ -2,7 +2,8 @@
   "name": "vue-hook-directive",
   "description": "Plugin for vue, which integrates features from hookable to vue directives and composable",
   "author": "1bye",
-  "repository": "",
+  "repository": "https://github.com/1bye/vue-hook-directive",
+
   "private": true,
   "version": "0.0.1",
   "type": "module",

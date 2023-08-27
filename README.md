@@ -1,18 +1,128 @@
-# Vue 3 + TypeScript + Vite
+# Vue Hook Directive
+The **Vue Hook Directive** is a powerful Vue plugin 
+that seamlessly integrates features from the [hookable](https://www.npmjs.com/package/hookable) library into Vue directives and composables, enabling you to harness the full potential of hooks within your Vue applications.
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+## Installation
+You can easily install the Vue Hook Directive using your preferred package manager:
 
-## Recommended IDE Setup
+Using npm:
+```bash
+npm install vue-hook-directive
+```
+Using yarn:
+```bash
+yarn add vue-hook-directive
+```
+Using pnpm:
+```bash
+pnpm add vue-hook-directive
+```
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+## Why Choose This Library?
+There are several compelling reasons to utilize this library in your Vue projects:
 
-## Type Support For `.vue` Imports in TS
+1. **Cross-Component Hooks**: You can utilize hooks across different components effortlessly. For instance:
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
+```vue
+<!-- MyFirstComponent.vue -->
+<template>
+  <button v-hook:click.expand>Click on me</button>
+</template>
+```
 
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
+1. **Flexible Hook Names**: Hooks can be assigned names to enable fine-grained control. 
+   If a hook name isn't specified, the default hook name will be the associated event name (e.g., 'click' for a click event).
 
-1. Disable the built-in TypeScript Extension
-   1. Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-   2. Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
+2. **Dynamic Hook Usage**: Hooks can be accessed dynamically using the `$hook` function and a specific hook name:
+
+## Plugin Functionality
+
+### Composable Usage
+
+The Vue Hook Directive offers a composable API:
+
+```ts
+import { useHook } from 'vue-hook-directive';
+
+const { hook, callHook } = useHook();
+
+hook('expand', (data) => {
+    console.log(data || true);
+});
+```
+
+### Global Function `$hook`
+You can utilize the global `$hook` function to integrate hooks into various Vue directives:
+
+```vue
+
+<template>
+  {{ $hook('hook_name') }}
+  <!--  Can be used as  -->
+  <div v-if="$hook('hook_name')"></div>
+  <div v-show="$hook('hook_name')"></div>
+  <!--  And etc all build in vue hooks...  -->
+  <div v-for="hook in $hook('hook_name')"></div>
+
+  <!--  Also $hook have options -->
+  <!--  Clears hook result after 1000ms -->
+  {{ $hook('hook_name', {clear: 1000}) }}
+
+  <!--  Clears hook result after 1000ms, and set default value 'something' -->
+  {{ $hook('hook_name', {clear: 1000, default: 'something'}) }}
+
+  <!--  Just set default value instead of null -->
+  {{ $hook('hook_name', {default: 'something'}) }}
+</template>
+```
+
+## Usage
+
+### Basic Usage
+To incorporate the Vue Hook Directive into your application:
+
+```ts
+import { createApp } from 'vue';
+import App from './App.vue';
+import { vueDirective } from 'vue-hook-directive';
+
+const app = createApp(App);
+
+app.use(vueDirective, {});
+
+app.mount('#app');
+```
+
+### Usage with Options
+You can customize the behavior of the Vue Hook Directive by passing options:
+```ts
+app.use(vueDirective, {
+    prefix: '', // Adds a prefix before hooks
+    listeners: ['your-custom-listener'] // Add your custom listeners for v-hook directive
+});
+```
+
+### Usage with Nuxt
+In a Nuxt application, you can follow these steps:
+1. Create a file named `VueHookDirective.js` within the `/plugins` directory in your Nuxt app.
+2. In `VueHookDirective.js`, import and apply the Vue Hook Directive:
+
+
+```ts
+import { vueDirective } from 'vue-hook-directive';
+
+export default defineNuxtPlugin((nuxtApp) => {
+    nuxtApp.vueApp.use(vueDirective);
+    
+    // or with options
+    
+    nuxtApp.vueApp.use(vueDirective, {
+        prefix: '', // Adds a prefix before hooks
+        listeners: ['your-custom-listener'] // Add your custom listeners for v-hook directive
+    });
+});
+```
+
+By following these steps, you can seamlessly integrate the Vue Hook Directive into your Nuxt project.
+
+Harness the power of hooks and enhance your Vue applications with the Vue Hook Directive!

@@ -1,0 +1,24 @@
+{
+  "name": "vue-hook-directive",
+  "description": "Plugin for vue, which integrates features from hookable to vue directives and composable",
+  "author": "1bye",
+  "repository": "",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "hookable": "^5.5.3",
+    "vue": "^3.2.47"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.1.0",
+    "typescript": "^4.9.3",
+    "vite": "^4.2.0",
+    "vue-tsc": "^1.2.0"
+  }
+}

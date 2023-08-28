@@ -31,8 +31,8 @@ type Obj<T> = {
 }
 
 interface vueDirectiveHookOptions {
-    clear?: number,
-    default?: any,
+    clear?: number | null,
+    default?: any | null,
 }
 
 const hook = createHooks();
@@ -48,29 +48,34 @@ export const vueDirective = {
                 eventListeners.push(...listeners);
 
             if (prefix)
-                _prefix = prefix;
+                _prefix = prefix || '';
         }
 
         const hooks: Ref<Obj<any>> = ref({});
-        const hooksTimeouts: Ref<Obj<any>> = ref({});
+        const hooksTimeouts: Obj<any> = {};
 
         app.config.globalProperties.$hook = (key: string, options?: vueDirectiveHookOptions) => {
-            const opts = {clear: null, default: null};
+            const opts: vueDirectiveHookOptions = {clear: null, default: null};
             if (options) {
                 const {clear, default: _def} = options;
                 if (clear) opts.clear = clear;
                 if (_def) opts.default = _def;
             }
 
+            key = `${_prefix}${key}`;
+
             if(hooks.value[key] === undefined) hooks.value[key] = opts.default;
 
-            if (hooksTimeouts.value[key]) clearTimeout(hooksTimeouts.value[key]);
-
             if (opts.clear) {
-                hooksTimeouts.value[key] = setTimeout(() => {
+                if (hooksTimeouts[key]) {
+                    clearTimeout(hooksTimeouts[key]);
+                }
+
+                hooksTimeouts[key] = setTimeout(() => {
                     hooks.value[key] = opts.default;
                 }, opts.clear)
             }
+
             return hooks.value[key];
         }
 
@@ -93,10 +98,12 @@ export const vueDirective = {
                     const modifiers = Object.keys(binding.modifiers);
                     if (modifiers.length >= 1) {
                         const last = modifiers.at(-1) === 'toggle' ? modifiers.pop() : null
-                        for (const modifier of modifiers) {
+                        for (let modifier of modifiers) {
+                            modifier = `${_prefix}${modifier}`;
                             let value = last === 'toggle' ? !hooks.value[modifier] : binding.value;
                             hooks.value[modifier] = value;
-                            await hook.callHook(`${_prefix}${modifier}`, value);
+
+                            await hook.callHook(modifier, value);
                         }
                     }
                 });

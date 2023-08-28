@@ -3,10 +3,21 @@
   "description": "Plugin for vue, which integrates features from hookable to vue directives and composable",
   "author": "1bye",
   "repository": "https://github.com/1bye/vue-hook-directive",
-
-  "private": true,
-  "version": "0.0.1",
+  "license": "MIT",
+  "private": false,
+  "version": "0.1.4",
   "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "dist/index.umd.cjs",
+  "module": "dist/index.js",
+  "exports": {
+    ".": {
+      "import": "dist/index.js",
+      "require": "dist/index.umd.cjs"
+    }
+  },
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc && vite build",

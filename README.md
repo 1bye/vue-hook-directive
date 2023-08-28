@@ -35,6 +35,14 @@ There are several compelling reasons to utilize this library in your Vue project
 
 2. **Dynamic Hook Usage**: Hooks can be accessed dynamically using the `$hook` function and a specific hook name:
 
+```vue
+<!-- MySecondComponent.vue -->
+<template>
+  <div class="card" v-if="$hook('expand')">Showed</div>
+</template>
+```
+
+
 ## Plugin Functionality
 
 ### Composable Usage

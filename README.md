@@ -84,6 +84,27 @@ You can utilize the global `$hook` function to integrate hooks into various Vue 
 </template>
 ```
 
+Directive usage, `v-hook:event_name.hook_name="value""`
+
+```vue
+<template>
+<!--  Simple usage  -->
+   <button v-hook:click.expand>Click to expand</button>
+<!--  Usage with value  -->
+   <button v-hook:click.expand="'any value, object and etc...'">Click to expand</button>
+<!--   Usage with .toggle  -->
+   <button v-hook:click.expand.toggle>Click to expand</button>
+<!--   .toggle toggles boolean value (true - false)  -->
+   <div v-if="$hook('expand')">
+      Toggle view
+   </div>
+<!--   Usage with several hooks name  -->
+   <button v-hook:click.expand.expand2.expand3.etc>Click to expand</button>
+<!--   with .toggle-->
+   <button v-hook:click.expand.expand2.expand3.toggle>Click to expand</button>
+</template>
+```
+
 ## Usage
 
 ### Basic Usage

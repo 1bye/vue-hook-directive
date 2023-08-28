@@ -83,7 +83,7 @@ You can utilize the global `$hook` function to integrate hooks into various Vue 
   {{ $hook('hook_name', {default: 'something'}) }}
 </template>
 ```
-
+### Directive
 Directive usage, `v-hook:event_name.hook_name="value""`
 
 ```vue
